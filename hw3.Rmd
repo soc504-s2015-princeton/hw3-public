@@ -1,0 +1,116 @@
+---
+title: "Homework 3: Teachers' Union Needs Your Help"
+author: "your name here"
+date: "Due: Sunday, Feb 22, 2015"
+output: html_document
+---
+
+Topics covered in this homework include:
+
+- regression
+- residuals and diagnostics
+- dummy variables and interactions
+- ggplot2
+
+Imagine that you've been urged by the teachers' union to show that higher teacher pay leads to better education outcomes.  Of course, you don't do advocacy research --- you are a seeker of truth --- but you decide to investigate this questions scientifically using data about SAT scores and other educational indicators at the state level.  For now we can pretent that this is the only available data (it comes from John Fox's website).
+
+[Read the data documentation](http://socserv.socsci.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/States.pdf) and use the code below to load it
+```{r}
+# [your code here]
+```
+
+Before doing anything else, just play with the data to get a sense of it.
+
+(@) Make a scatter plot showing the relationship between average teacher pay and average sat score at the state level.  To do this you might have to create a new variable.  And, overlay a regression line on the plot.
+
+```{r}
+# [your code here]
+```
+
+(@) Fit a simple regression model to predict total SAT score based on teacher pay.
+
+```{r}
+# [your code here]
+```
+
+(@) Explain the substantive conclusion that you would draw from the scatter plot and regression analysis.
+
+```{answer}
+your answer here
+```
+
+You took these results back to the teachers' union and they didn't believe them.  You didn't believe them either so you decided to investigate further.
+
+(@) Use the augment function from the broom package to add the predicted values, residulats, and so on to the data.
+
+```{r}
+# [your code here]
+```
+
+(@) Which states have the highest predicted SAT scores?
+
+```{r}
+# [your code here]
+```
+
+(@) Does this make sense?  Note, if you are not from the US, you might need to ask someone from the US.  Explain.
+
+```{answer}
+your answer here
+```
+
+(@) Now fit a regression model that predicts SAT score with teacher pay and precent of students taking the SAT.
+
+```{r}
+# [your code here]
+```
+
+(@) Explain how this changes your interpration of the relationship between teacher pay and SAT scores.
+
+```{answer}
+your answer here
+```
+
+## Occupational prestige 
+
+Now we are going to understand the relationship between typical education, income, job type, and occupation prestigue using the data from Duncan.  You can read the documentation [here](http://socserv.socsci.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/Duncan.pdf)
+
+Here's some code to read in and clean the data.  And for the purposes of this assignment we are going to exclude professionals.  In other words, we are only concerned about white collar and blue collar occupations.  Again, notice that the unit here is occupations.
+
+
+```{r}
+# [your code here]
+```
+
+(@) Run a regression model to summarize the relationship between education, income, and occupational prestige?   Here education is the percentage of people in the field who have graduated from high school in 1950.
+
+```{r}
+# [your code here]
+```
+
+(@) Now run a regression model where education is used to predict occupational prestige and the relationship between education and occupational prestige is allowed to vary by occupation type (e.g., white collar, blue collar).
+
+```{r}
+# [your code here]
+```
+
+(@)  In words, how would you summarize the conclusions from the model above?
+
+```{answer}
+your answer here
+```
+
+(@) Make a scatter plot showing the relationship between education and prestige for blue collar and white collar workers.  Include the best fit lines for each group.
+
+```{r}
+# [your code here]
+```
+
+
+#### The command below is helpful for debugging, please don't change it
+
+```{r echo=FALSE}
+sessionInfo()
+```
+
+
