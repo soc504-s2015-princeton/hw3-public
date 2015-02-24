@@ -1,7 +1,7 @@
 ---
 title: "Homework 3: Teachers' Union Needs Your Help"
 author: "your name here"
-date: "Due: Sunday, Feb 22, 2015"
+date: "Due: Sunday, March 1, 2015"
 output: html_document
 ---
 
@@ -12,7 +12,7 @@ Topics covered in this homework include:
 - dummy variables and interactions
 - ggplot2
 
-Imagine that you've been urged by the teachers' union to show that higher teacher pay leads to better education outcomes.  Of course, you don't do advocacy research --- you are a seeker of truth --- but you decide to investigate this questions scientifically using data about SAT scores and other educational indicators at the state level.  For now we can pretent that this is the only available data (it comes from John Fox's website).
+Imagine that you've been urged by the teachers' union to show that higher teacher pay leads to better education outcomes.  Of course, you don't do advocacy research --- you are a seeker of truth --- but you decide to investigate this questions scientifically using data about SAT scores and other educational indicators at the state level.  For now we can pretend that this is the only available data (it comes from John Fox's website).
 
 [Read the data documentation](http://socserv.socsci.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/States.pdf) and use the code below to load it
 ```{r}
@@ -78,34 +78,56 @@ Now we are going to understand the relationship between typical education, incom
 Here's some code to read in and clean the data.  And for the purposes of this assignment we are going to exclude professionals.  In other words, we are only concerned about white collar and blue collar occupations.  Again, notice that the unit here is occupations.
 
 
+```{r echo=FALSE}
+data <- read.table("data/Duncan.txt", header=TRUE)
+data$state <- rownames(data)
+rownames(data) <- NULL
+data <- tbl_df(data)
+data <- filter(data, type %in% c("wc", "bc"))
+```
+
+(@) Run a regression model to predict the prestige of an occupation based on the level of education of people in that occupation (measured by the percentage of people in the field who have graduated from high school in 1950).
+
 ```{r}
 # [your code here]
 ```
 
-(@) Run a regression model to summarize the relationship between education, income, and occupational prestige?   Here education is the percentage of people in the field who have graduated from high school in 1950.
+(@) Make a plot showing the data and the model that you fit.
 
 ```{r}
 # [your code here]
 ```
 
-(@) Now run a regression model where education is used to predict occupational prestige and the relationship between education and occupational prestige is allowed to vary by occupation type (e.g., white collar, blue collar).
+(@) Now run a regression model to predict the prestige of an occupation based on the level of education of people in that occupation (measured by the percentage of people in the field who have graduated from high school in 1950) and the occupation type (blue collar/white collar).
 
 ```{r}
 # [your code here]
 ```
 
-(@)  In words, how would you summarize the conclusions from the model above?
+(@) Make a plot showing the data and the model that you fit.
+
+```{r}
+# [your code here]
+```
+
+
+(@) Now run a regression model to predict occupational prestige based on the level of education and occupation type where the relationship between education and occupational prestige is allowed to vary by occupation type.
+
+```{r}
+# [your code here]
+```
+
+(@) Make a plot showing the data and the model that you fit.
+
+```{r}
+# [your code here]
+```
+
+(@)  In words, how would you summarize the conclusions from three models above?
 
 ```{answer}
 your answer here
 ```
-
-(@) Make a scatter plot showing the relationship between education and prestige for blue collar and white collar workers.  Include the best fit lines for each group.
-
-```{r}
-# [your code here]
-```
-
 
 #### The command below is helpful for debugging, please don't change it
 
