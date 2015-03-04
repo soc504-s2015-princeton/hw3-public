@@ -1,0 +1,199 @@
+---
+title: "Homework 3: Teachers' Union Needs Your Help"
+author: "your name here"
+date: "Due: Sunday, March 1, 2015"
+output: html_document
+---
+
+Topics covered in this homework include:
+
+- regression
+- residuals and diagnostics
+- dummy variables and interactions
+- ggplot2
+
+Imagine that you've been urged by the teachers' union to show that higher teacher pay leads to better education outcomes.  Of course, you don't do advocacy research --- you are a seeker of truth --- but you decide to investigate this questions scientifically using data about SAT scores and other educational indicators at the state level.  For now we can pretend that this is the only available data (it comes from John Fox's website).
+
+[Read the data documentation](http://socserv.socsci.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/States.pdf) and use the code below to load it
+```{r echo=FALSE}
+library(dplyr)
+data <- read.table("data/States.txt", header=TRUE)
+# now clean up a bit
+data <- rename(data, sat.verbal = satVerbal)
+data <- rename(data, sat.math = satMath)
+data <- rename(data, percent.taking = percentTaking)
+data <- rename(data, percent.no.hs = percentNoHS)
+data <- rename(data, teacher.pay = teacherPay)
+
+# not good to have state as a rowname
+data$state <- rownames(data)
+rownames(data) <- NULL
+data <- tbl_df(data)
+```
+
+Before doing anything else, just play with the data to get a sense of it.
+
+(@) Make a scatter plot showing the relationship between average teacher pay and average sat score at the state level.  To do this you might have to create a new variable.  And, overlay a regression line on the plot.
+
+```{r}
+data <- mutate(data, sat.overall = sat.verbal + sat.math)
+library(ggplot2)
+p  <- ggplot(data, aes(x = teacher.pay, y = sat.overall))
+p + geom_point() + stat_smooth(method = "lm")
+```
+
+(@) Fit a simple regression model to predict total SAT score based on teacher pay.
+
+```{r}
+fit <- lm(sat.overall ~ teacher.pay, data = data)
+library(broom)
+tidy(fit)
+```
+
+(@) Explain the substantive conclusion that you would draw from the scatter plot and regression analysis.
+
+```{answer}
+It looks like students get lower SAT scores in states with higher teacher pay.  Of course, correlation does not imply caustion.
+```
+
+You took these results back to the teachers' union and they didn't believe them.  You didn't believe them either so you decided to investigate further.
+
+(@) Use the augment function from the broom package to add the predicted values, residulats, and so on to the data.
+
+```{r}
+data.aug <- augment(fit, data)
+head(data.aug)
+```
+
+(@) Which states have the highest predicted SAT scores?
+
+```{r}
+data.aug <- arrange(data.aug, desc(.fitted))
+head(data.aug)
+```
+
+(@) Does this make sense?  Note, if you are not from the US, you might need to ask someone from the US.  Explain.
+
+```{answer}
+No, it does not make sense.  I would not expect South Dakota, Lousiana, and North Dakota to have the highest predicted SAT scores.
+```
+
+(@) Now fit a regression model that predicts SAT score with teacher pay and precent of students taking the SAT.
+
+```{r}
+fit <- lm(sat.overall ~ teacher.pay + percent.taking, data = data)
+tidy(fit)
+```
+
+(@) Explain how this changes your interpration of the relationship between teacher pay and SAT scores.
+
+```{answer}
+States with the highest SAT scores had the fewest students taking the SAT.  Once this fact was added to the model, the parameters changes and teacher pay now seems to be positive related to SAT scores.
+```
+
+## Occupational prestige 
+
+Now we are going to understand the relationship between typical education, income, job type, and occupation prestigue using the data from Duncan.  You can read the documentation [here](http://socserv.socsci.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/Duncan.pdf)
+
+Here's some code to read in and clean the data.  And for the purposes of this assignment we are going to exclude professionals.  In other words, we are only concerned about white collar and blue collar occupations.  Again, notice that the unit here is occupations.
+
+
+```{r echo=FALSE}
+data <- read.table("data/Duncan.txt", header=TRUE)
+data$state <- rownames(data)
+rownames(data) <- NULL
+data <- tbl_df(data)
+data <- filter(data, type %in% c("wc", "bc"))
+```
+
+(@) Run a regression model to predict the prestige of an occupation based on the level of education of people in that occupation (measured by the percentage of people in the field who have graduated from high school in 1950).
+
+```{r}
+fit <- lm(prestige ~ education, data=data)
+fit.df <- tidy(fit)
+print(fit.df)
+```
+
+(@) Make a plot showing the data and the model that you fit.
+
+```{r}
+inter <- as.numeric(filter(fit.df, term=="(Intercept)") %>%
+                    select(estimate))
+slope <- as.numeric(filter(fit.df, term=="education") %>%
+                    select(estimate))
+
+p <- ggplot(data, aes(x=education, y=prestige))
+p + geom_jitter() + 
+  geom_abline(intercept = inter, slope = slope)
+```
+
+(@) Now run a regression model to predict the prestige of an occupation based on the level of education of people in that occupation (measured by the percentage of people in the field who have graduated from high school in 1950) and the occupation type (blue collar/white collar).
+
+```{r}
+data <- mutate(data, bc = as.numeric(type=="bc"))
+fit <- lm(prestige ~ education + bc, data=data)
+fit.df <- tidy(fit)
+print(fit.df)
+```
+
+(@) Make a plot showing the data and the model that you fit.
+
+```{r}
+inter.wc <- as.numeric(filter(fit.df, term=="(Intercept)") %>%
+                    select(estimate))
+inter.bc <- inter.wc + as.numeric(filter(fit.df, term=="bc") %>%
+                                  select(estimate))
+
+slope <- as.numeric(filter(fit.df, term=="education") %>%
+                    select(estimate))
+
+p <- ggplot(data, aes(x=education, y=prestige, colour=type))
+p + geom_jitter() + 
+  scale_color_manual(values = c("blue", "white")) +
+  geom_abline(intercept = inter.bc, slope = slope, col="blue") + 
+  geom_abline(intercept = inter.wc, slope = slope, col="white")
+```
+
+
+(@) Now run a regression model to predict occupational prestige based on the level of education and occupation type where the relationship between education and occupational prestige is allowed to vary by occupation type.
+
+```{r}
+fit.2 <- lm(prestige ~ education + bc + bc:education, data=data)
+tidy(fit.2)
+```
+
+(@) Make a plot showing the data and the model that you fit.
+
+```{r}
+fit <- lm(prestige ~ education + bc + bc:education, data=data)
+fit.df <- tidy(fit)
+
+inter.wc <- as.numeric(filter(fit.df, term=="(Intercept)") %>%
+                         select(estimate))
+inter.bc <- inter.wc + as.numeric(filter(fit.df, term=="bc") %>%
+                                        select(estimate))
+slope.wc <- as.numeric(filter(fit.df, term=="education") %>%
+                      select(estimate))
+slope.bc <- slope.wc + as.numeric(filter(fit.df, term=="education:bc") %>% 
+                                          select(estimate))
+
+p <- ggplot(data, aes(x=education, y=prestige, colour=type))
+p + geom_jitter() + 
+  scale_color_manual(values = c("blue", "white")) +
+  geom_abline(intercept = inter.bc, slope = slope.bc, col="blue") + 
+  geom_abline(intercept = inter.wc, slope = slope.wc, col="white")
+```
+
+(@)  In words, how would you summarize the conclusions from three models above?
+
+```{answer}
+In the simple model we see that occupations with higher levels of education are predicted to have higher prestige.  When we add a dummy variable for type, it appears that blue collar jobs are predicted to have higher prestige for a given level of education.  Finally, from the model with a dummy variable and an interaction, we estimate that predictions of occupational prestige seem to be more sensitive to the level of education than predictions for white collar jobs.  In other words, even this simple example is quite complicated.
+```
+
+#### The command below is helpful for debugging, please don't change it
+
+```{r echo=FALSE}
+sessionInfo()
+```
+
+
